@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prisma:generate": "prisma generate --schema=../../packages/db/prisma/schema.prisma",
+    "prisma:generate": "npx prisma generate --schema=../../packages/db/prisma/schema.prisma",
     "dev": "pnpm prisma:generate && next dev --webpack",
     "build": "pnpm prisma:generate && next build --webpack",
     "start": "next start",
