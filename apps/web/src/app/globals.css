@@ -1,0 +1,365 @@
+@import "tailwindcss";
+
+:root {
+  /* Redline (Cockpit V13 - Final Approved Solid) */
+  color-scheme: dark;
+  --background: #000000;       /* Pure depth */
+  --foreground: #FFFFFF;       /* Pure white */
+  --card: #111111;             /* Sharp elevation */
+  --card-foreground: #FFFFFF;
+  --muted: #1A1A1A;            /* Solid section dark */
+  --muted-foreground: #A1A1AA; /* Zinc-400: Guaranteed visibility on black */
+  --border: #333333;           /* Solid technical line */
+
+  /* Brand / status */
+  --accent: #FF1E1E;           /* Racing Red */
+  --accent-2: #FFCC00;         /* Signal Yellow */
+  --accent-3: #32D74B;         /* OK Stamp Green */
+
+  /* Geometry */
+  --radius: 0px; 
+  --radius-sm: 0px;
+  --chamfer: 10px;
+  --chamfer-sm: 8px;
+  --chamfer-lg: 14px;
+
+  /* Depth */
+  --shadow-sm: 0 0 0 1px rgba(0, 0, 0, 0.55), 0 18px 60px rgba(0, 0, 0, 0.65);
+  --shadow-md: 0 0 0 1px rgba(0, 0, 0, 0.55), 0 28px 90px rgba(0, 0, 0, 0.75);
+  --blur: 0px;
+
+  /* Patterns */
+  --grid: rgba(255, 255, 255, 0.03);
+  --scanline: rgba(255, 255, 255, 0.02);
+}
+
+/* Day Mode Override (Editorial V13) */
+[data-theme="day"] {
+  color-scheme: light;
+  --background: #F5F5F5;
+  --foreground: #111111;
+  --card: #FFFFFF;
+  --card-foreground: #111111;
+  --muted: #EDEDED;
+  --muted-foreground: #737373; /* Zinc-500: Guaranteed visibility on white */
+  --border: #D1D1D1;
+  --accent: #B4000B;           /* Editorial Red */
+  --accent-2: #9A6A12;         /* Ocher Yellow */
+  --accent-3: #1E6B3A;         /* Dark Stamp Green */
+  --grid: rgba(0, 0, 0, 0.04);
+  --scanline: rgba(0, 0, 0, 0.015);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-telemetry);
+  --radius: var(--radius);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+}
+
+/* Force dark mode behavior globally */
+html,
+body {
+  height: 100%;
+  color-scheme: dark;
+}
+
+body {
+  color: var(--foreground);
+  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+
+  /* Redline background: Clean Asphalt (No muddy gradients) */
+  background-color: var(--background);
+  background-image:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03), transparent 400px),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.05), transparent 70%);
+}
+
+/* Fix Chrome Autofill Background in Dark Mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--card) inset !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: var(--foreground);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+/* Utilities (small, stable, reusable) */
+.container-app {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1100px;
+  padding-inline: 16px;
+}
+
+.surface {
+  background: var(--card); /* Clean dark surface */
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  --_c: var(--chamfer);
+  clip-path: polygon(
+    var(--_c) 0,
+    calc(100% - var(--_c)) 0,
+    100% var(--_c),
+    100% calc(100% - var(--_c)),
+    calc(100% - var(--_c)) 100%,
+    var(--_c) 100%,
+    0 calc(100% - var(--_c)),
+    0 var(--_c)
+  );
+}
+
+.surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 35%),
+    linear-gradient(0deg, transparent 62%, rgba(255, 255, 255, 0.03));
+  opacity: 0.4;
+  clip-path: inherit;
+}
+
+.surface-hover {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.surface-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in oklab, var(--border) 80%, var(--accent) 20%);
+  background-color: color-mix(in oklab, var(--card) 95%, var(--accent) 5%);
+}
+
+.hairline-grid {
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center;
+  mask-image: radial-gradient(closest-side, rgba(0,0,0,0.9), rgba(0,0,0,0.2), transparent);
+}
+
+/* Scanlines overlay (subtle) - Fixed to use pseudo-element so it doesn't dim content */
+.scanlines {
+  position: relative;
+}
+
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 6px,
+    var(--scanline) 6px 7px
+  );
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  z-index: 10;
+  clip-path: inherit;
+}
+
+/* Legacy name used across pages: keep as a restrained texture layer */
+.carbon-fiber {
+  background-image:
+    repeating-linear-gradient(135deg, rgba(240, 240, 240, 0.05) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.55) 0 1px, transparent 1px 12px);
+  opacity: 0.10;
+  mix-blend-mode: overlay;
+}
+
+.display {
+  font-family: var(--font-display), var(--font-body), ui-sans-serif, system-ui;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.telemetry {
+  font-family: var(--font-telemetry), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.glow-red {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent),
+    0 0 24px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+/* Chamfer utilities */
+.chamfer {
+  --_c: var(--chamfer);
+  clip-path: polygon(
+    var(--_c) 0,
+    calc(100% - var(--_c)) 0,
+    100% var(--_c),
+    100% calc(100% - var(--_c)),
+    calc(100% - var(--_c)) 100%,
+    var(--_c) 100%,
+    0 calc(100% - var(--_c)),
+    0 var(--_c)
+  );
+}
+.chamfer-sm {
+  --_c: var(--chamfer-sm);
+  clip-path: polygon(
+    var(--_c) 0,
+    calc(100% - var(--_c)) 0,
+    100% var(--_c),
+    100% calc(100% - var(--_c)),
+    calc(100% - var(--_c)) 100%,
+    var(--_c) 100%,
+    0 calc(100% - var(--_c)),
+    0 var(--_c)
+  );
+}
+.chamfer-lg {
+  --_c: var(--chamfer-lg);
+  clip-path: polygon(
+    var(--_c) 0,
+    calc(100% - var(--_c)) 0,
+    100% var(--_c),
+    100% calc(100% - var(--_c)),
+    calc(100% - var(--_c)) 100%,
+    var(--_c) 100%,
+    0 calc(100% - var(--_c)),
+    0 var(--_c)
+  );
+}
+
+/* Velocity skew (apply only to headings / main CTA) */
+.skew-title {
+  transform: skew(-10deg);
+  display: inline-block;
+}
+.skew-cta {
+  transform: skew(-10deg);
+  display: inline-block;
+}
+
+/* Inner element used to un-skew the readable content */
+.skew-reset {
+  display: inline-block;
+}
+
+.skew-cta .skew-reset,
+.skew-title .skew-reset {
+  transform: skew(10deg);
+}
+
+.track-stripe {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--accent) 92%, transparent) 0 10px,
+      rgba(255, 255, 255, 0.10) 10px 20px,
+      transparent 20px 34px
+    );
+  opacity: 0.65;
+}
+
+.track-bar {
+  position: relative;
+}
+
+.track-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--accent) 85%, transparent),
+    color-mix(in oklab, var(--accent-2) 70%, transparent),
+    rgba(255, 255, 255, 0.18)
+  );
+  opacity: 0.9;
+}
+
+/* Scrollbar (Dark / Stealth) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Stagger Animation Utilities (if tailwind-animate is not present) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
+}
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+.fade-in {
+  animation-name: fadeIn;
+}
+.slide-in-from-bottom-4 {
+  animation-name: slideUp;
+}
+.zoom-in-95 {
+  animation-name: zoomIn;
+}
+
+.duration-700 { animation-duration: 700ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* Glitch Effect (use on key headings) */
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-2deg); }
+  40% { transform: skew(2deg); }
+  60% { transform: skew(-1deg); }
+  80% { transform: skew(1deg); }
+  100% { transform: skew(0deg); }
+}
+.glitch:hover {
+  animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+  color: var(--accent);
+}

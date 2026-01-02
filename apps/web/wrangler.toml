@@ -1,0 +1,7 @@
+name = "zahit-web"
+pages_build_output_dir = ".vercel/output/static"
+compatibility_date = "2024-11-18"
+
+[vars]
+# Add your environment variables here
+NEXT_PUBLIC_API_BASE = "https://zahit-api.your-domain.com/api/v1"

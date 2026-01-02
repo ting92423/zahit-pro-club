@@ -1,0 +1,29 @@
+{
+  "name": "zahit-pro-club",
+  "private": true,
+  "packageManager": "pnpm@10.26.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npx --yes pnpm@latest -r dev",
+    "build": "npx --yes pnpm@latest -r build",
+    "lint": "npx --yes pnpm@latest -r lint",
+    "format": "npx --yes prettier@3.6.2 . --write",
+    "typecheck": "npx --yes pnpm@latest -r typecheck"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}
+

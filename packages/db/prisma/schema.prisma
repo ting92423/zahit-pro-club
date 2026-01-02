@@ -1,0 +1,309 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // 本機開發先用 sqlite（無需安裝 DB）；日後上線可切回 postgresql 並重跑 migration。
+  provider = "sqlite"
+}
+
+// 先落「首日必備」的最小核心（依 `docs/pro-club-erd.md`）。
+// 注意：點數/活動/分潤等表後續再補；先把「訪客下單 + 查訂單」跑通。
+
+enum OrderStatus {
+  CREATED
+  UNPAID
+  PAID
+  FULFILLING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+  REFUNDING
+  REFUNDED
+}
+
+enum PaymentProvider {
+  ECPAY
+}
+
+enum PaymentStatus {
+  INITIATED
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT
+  ATM
+}
+
+enum PointTransactionType {
+  EARN
+  REDEEM
+  ADJUST
+  EXPIRE
+}
+
+model Member {
+  id            String   @id @default(uuid())
+  lineId        String?  @unique
+  name          String
+  phone         String   @unique
+  email         String   @unique
+  status        String   @default("ACTIVE")
+  tier          String   @default("GUEST")
+  pointsBalance Int      @default(0)
+  totalSpent    Int      @default(0)
+
+  // Profile (optional)
+  address       String?
+  carBrand      String?
+  carModel      String?
+  carYear       Int?
+  carPlate      String?
+  preferences   Json?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orders            Order[]
+  pointLedgers      PointLedger[]
+  eventRegistrations EventRegistration[]
+  notifications     Notification[]
+  redemptions       Redemption[]
+}
+
+model Event {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  location     String?
+  eventDate    DateTime
+  maxSlots     Int      @default(0)
+  currentSlots Int      @default(0)
+  price        Int      @default(0)
+  minTier      String   @default("GUEST")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  registrations EventRegistration[]
+}
+
+model EventRegistration {
+  id          String   @id @default(uuid())
+  eventId     String
+  memberId    String?
+  name        String   // Guest 報名用
+  phone       String
+  email       String
+  status      String   @default("REGISTERED") // REGISTERED, PAID, CHECKED_IN, CANCELLED
+  qrToken     String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event  Event   @relation(fields: [eventId], references: [id])
+  member Member? @relation(fields: [memberId], references: [id])
+
+  @@index([eventId])
+  @@index([memberId])
+  @@index([qrToken])
+}
+
+model PointLedger {
+  id          String               @id @default(uuid())
+  memberId    String
+  member      Member               @relation(fields: [memberId], references: [id])
+  type        PointTransactionType
+  pointsDelta Int
+  reason      String?
+  refType     String?
+  refId       String?
+  createdAt   DateTime             @default(now())
+
+  @@index([memberId, createdAt])
+}
+
+model MemberOtp {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([email, code])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  skus Sku[]
+}
+
+model Sku {
+  id          String   @id @default(uuid())
+  productId   String
+  skuCode     String   @unique
+  price       Int
+  memberPrice Int?
+  stock       Int      @default(0)
+  attributes  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product    Product     @relation(fields: [productId], references: [id])
+  orderItems OrderItem[]
+
+  @@index([productId])
+}
+
+model Order {
+  id               String      @id @default(uuid())
+  orderNumber      String      @unique
+  status           OrderStatus @default(UNPAID)
+
+  memberId         String?
+  member           Member?     @relation(fields: [memberId], references: [id])
+
+  subtotalAmount   Int
+  discountAmount   Int         @default(0)
+  pointsRedeemed   Int         @default(0)
+  totalAmount      Int
+
+  shippingName     String
+  shippingPhone    String
+  shippingEmail    String
+  shippingAddress  String
+
+  shippingCarrier    String?
+  shippingTrackingNo String?
+  shippedAt          DateTime?
+  completedAt        DateTime?
+  customerReportedPaidAt DateTime?
+
+  salesCode        String?     // 業務歸因
+  claimedAt        DateTime?
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  items OrderItem[]
+  payments Payment[]
+
+  @@index([memberId, createdAt])
+  @@index([status, createdAt])
+  @@index([shippingEmail, createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  memberId  String?  // 若為 null 則為全體廣播
+  title     String
+  content   String
+  type      String   @default("SYSTEM") // SYSTEM, PROMO, ALERT
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  member Member? @relation(fields: [memberId], references: [id])
+
+  @@index([memberId, createdAt])
+}
+
+model AdPlacement {
+  id          String   @id @default(uuid())
+  title       String
+  imageUrl    String
+  linkUrl     String?
+  position    String   // HOME_HERO, SIDEBAR, etc.
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean  @default(true)
+  minTier     String   @default("GUEST")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model RedemptionItem {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  pointsCost  Int
+  stock       Int      @default(0)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  redemptions Redemption[]
+}
+
+model Redemption {
+  id          String   @id @default(uuid())
+  memberId    String
+  itemId      String
+  status      String   @default("ISSUED") // ISSUED, REDEEMED, VOID
+  qrToken     String   @unique
+  redeemedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  member Member         @relation(fields: [memberId], references: [id])
+  item   RedemptionItem @relation(fields: [itemId], references: [id])
+
+  @@index([memberId])
+  @@index([qrToken])
+}
+
+model Payment {
+  id              String          @id @default(uuid())
+  provider        PaymentProvider
+  method          PaymentMethod?
+  status          PaymentStatus   @default(INITIATED)
+
+  orderId         String
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  amount          Int
+  merchantTradeNo String          @unique
+  providerTradeNo String?
+  paidAt          DateTime?
+
+  atmBankCode     String?
+  atmAccount      String?
+  atmExpireAt     DateTime?
+
+  rawCallback     Json?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([orderId, createdAt])
+  @@index([status, createdAt])
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  skuId      String
+  qty        Int
+  unitPrice  Int
+  totalPrice Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sku   Sku   @relation(fields: [skuId], references: [id])
+
+  @@index([orderId])
+  @@index([skuId])
+}
+
