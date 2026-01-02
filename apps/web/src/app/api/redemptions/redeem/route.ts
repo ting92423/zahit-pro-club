@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+
+export const runtime = 'edge';
 import { cookies } from 'next/headers';
 import { getApiBase } from '@/lib/api-base';
 

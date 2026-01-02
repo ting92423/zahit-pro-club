@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 import { getApiBase } from '@/lib/api-base';
 
 const API_BASE = getApiBase();
