@@ -8,6 +8,9 @@ import { MobileNav } from '@/components/mobile-nav';
 import { CommandMenu } from '@/components/command-menu';
 import { ThemeProvider } from '@/components/theme-provider';
 
+// Cloudflare Pages requires Edge Runtime for non-static routes when using next-on-pages.
+export const runtime = 'edge';
+
 const bodySans = Noto_Sans_TC({
   variable: '--font-body',
   subsets: ['latin'],

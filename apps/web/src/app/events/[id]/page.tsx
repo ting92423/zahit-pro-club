@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { headers, cookies } from 'next/headers';
-import { TIER_THRESHOLDS } from '@zahit/shared';
+import { TIER_THRESHOLDS } from '@/lib/shared-lite';
 import { SiteHeader } from '@/components/site-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

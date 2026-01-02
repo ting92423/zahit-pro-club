@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { TIERS } from '@zahit/shared';
+import { TIERS } from '@/lib/shared-lite';
 
 type EventRow = {
   id: string;

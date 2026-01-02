@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getMemberId } from '@/lib/auth-edge';
-import { TIER_BENEFITS } from '@zahit/shared';
+import { TIER_BENEFITS } from '@/lib/shared-lite';
 
 export const runtime = 'edge';
 
