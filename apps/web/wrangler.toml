@@ -4,4 +4,10 @@ compatibility_date = "2024-11-18"
 
 [vars]
 # Add your environment variables here
-NEXT_PUBLIC_API_BASE = "https://zahit-api.your-domain.com/api/v1"
+NEXT_PUBLIC_API_BASE_URL = "/api"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zahit-db"
+database_id = "07269aa1-d3e2-457e-bc7b-3b697accd7c6"
+preview_database_id = "DB"
