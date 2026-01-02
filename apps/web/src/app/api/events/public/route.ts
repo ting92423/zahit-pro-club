@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
 
-import { getApiBase } from '@/lib/api-base';
-
-const API_BASE = getApiBase();
-
+// Local/demo-friendly endpoint.
+// The previous implementation proxied to an upstream API_BASE; for the Cloudflare-only build
+// we serve JSON directly here (empty list until D1-backed events are implemented).
 export async function GET() {
-  const res = await fetch(`${API_BASE}/events/public`, { cache: 'no-store' });
-  const json = (await res.json()) as any;
-  return NextResponse.json(json, { status: res.status });
+  return NextResponse.json({ data: [] });
 }
 
