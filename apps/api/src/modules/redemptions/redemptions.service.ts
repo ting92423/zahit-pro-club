@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PointTransactionType } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,12 +19,16 @@ export class RedemptionsService {
   }
 
   async redeem(memberId: string, itemId: string) {
-    const item = await this.prisma.redemptionItem.findUnique({ where: { id: itemId } });
+    const item = await this.prisma.redemptionItem.findUnique({
+      where: { id: itemId },
+    });
     if (!item || !item.isActive || item.stock <= 0) {
       throw new BadRequestException('Item unavailable');
     }
 
-    const member = await this.prisma.member.findUnique({ where: { id: memberId } });
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+    });
     if (!member || member.pointsBalance < item.pointsCost) {
       throw new BadRequestException('Insufficient credits');
     }
@@ -71,7 +79,8 @@ export class RedemptionsService {
       include: { item: true, member: true },
     });
     if (!r) throw new NotFoundException('Voucher not found');
-    if (r.status !== 'ISSUED') throw new BadRequestException('Voucher already used or void');
+    if (r.status !== 'ISSUED')
+      throw new BadRequestException('Voucher already used or void');
 
     const updated = await this.prisma.redemption.update({
       where: { id: r.id },
@@ -82,7 +91,9 @@ export class RedemptionsService {
   }
 
   async listAdminItems() {
-    return this.prisma.redemptionItem.findMany({ orderBy: { createdAt: 'desc' } });
+    return this.prisma.redemptionItem.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async createItem(data: any) {

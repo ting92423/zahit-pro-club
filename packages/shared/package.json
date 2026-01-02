@@ -17,6 +17,9 @@
     "dev": "tsc -p tsconfig.json -w --preserveWatchOutput",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "echo \"(shared) lint handled at app-level\""
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
   }
 }
 

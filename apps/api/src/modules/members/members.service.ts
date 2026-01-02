@@ -36,8 +36,13 @@ export class MembersService {
     });
   }
 
-  async adjustPoints(memberId: string, input: { points_delta: number; reason?: string }) {
-    const member = await this.prisma.member.findUnique({ where: { id: memberId } });
+  async adjustPoints(
+    memberId: string,
+    input: { points_delta: number; reason?: string },
+  ) {
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+    });
     if (!member) throw new NotFoundException('Member not found');
 
     const delta = Number(input.points_delta);
@@ -80,7 +85,10 @@ export class MembersService {
     });
   }
 
-  async updateMember(id: string, data: { name?: string; phone?: string; tier?: string }) {
+  async updateMember(
+    id: string,
+    data: { name?: string; phone?: string; tier?: string },
+  ) {
     const member = await this.prisma.member.findUnique({ where: { id } });
     if (!member) throw new NotFoundException('Member not found');
 
@@ -149,7 +157,10 @@ export class MembersService {
   /**
    * 內部評估升級邏輯
    */
-  private async evaluateTierInternal(tx: Prisma.TransactionClient, member: Member) {
+  private async evaluateTierInternal(
+    tx: Prisma.TransactionClient,
+    member: Member,
+  ) {
     const nextTier = getTierBySpent(member.totalSpent);
 
     if (nextTier !== member.tier) {

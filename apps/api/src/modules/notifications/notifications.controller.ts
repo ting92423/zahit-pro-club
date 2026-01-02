@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { Roles } from '../rbac/roles.decorator';
 import { NotificationsService } from './notifications.service';
 
@@ -47,7 +56,15 @@ export class NotificationsController {
 
   @Roles('ADMIN')
   @Post()
-  async create(@Body() body: { memberId?: string; title: string; content: string; type?: string }) {
+  async create(
+    @Body()
+    body: {
+      memberId?: string;
+      title: string;
+      content: string;
+      type?: string;
+    },
+  ) {
     return { data: await this.notifications.create(body) };
   }
 }

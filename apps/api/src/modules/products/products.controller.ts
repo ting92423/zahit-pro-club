@@ -15,4 +15,3 @@ export class ProductsController {
     return { data: await this.products.get(id) };
   }
 }
-

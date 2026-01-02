@@ -39,7 +39,7 @@ export function MemberNotificationsClient({ initial }: { initial: NotificationDt
       if (unreadOnly) qs.set('unreadOnly', 'true');
       if (type) qs.set('type', type);
       const res = await fetch(`/api/notifications?${qs.toString()}`, { cache: 'no-store' });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Load failed');
       const data = (json?.data ?? []) as NotificationDto[];
       setItems(data);
@@ -61,7 +61,7 @@ export function MemberNotificationsClient({ initial }: { initial: NotificationDt
       if (unreadOnly) qs.set('unreadOnly', 'true');
       if (type) qs.set('type', type);
       const res = await fetch(`/api/notifications?${qs.toString()}`, { cache: 'no-store' });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Load failed');
       const data = (json?.data ?? []) as NotificationDto[];
       setItems((prev) => [...prev, ...data]);
@@ -83,7 +83,7 @@ export function MemberNotificationsClient({ initial }: { initial: NotificationDt
     setBusyId(id);
     try {
       const res = await fetch(`/api/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH' });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Mark read failed');
       // optimistic update
       setItems((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
@@ -97,7 +97,7 @@ export function MemberNotificationsClient({ initial }: { initial: NotificationDt
     setIsAllBusy(true);
     try {
       const res = await fetch('/api/notifications/read-all', { method: 'PATCH' });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Mark all read failed');
       setItems((prev) => prev.map((n) => ({ ...n, is_read: true })));
       router.refresh();

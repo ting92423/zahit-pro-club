@@ -9,4 +9,3 @@ import { AdminSalesService } from './admin-sales.service';
   providers: [AdminSalesService],
 })
 export class AdminSalesModule {}
-

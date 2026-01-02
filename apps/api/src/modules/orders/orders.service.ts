@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, OrderStatus, PointTransactionType } from '@prisma/client';
 import { randomInt } from 'crypto';
 
@@ -50,13 +54,19 @@ export class OrdersService {
       qty: Number(it.qty),
     }));
 
-    if (items.some((it) => !it.skuCode || !Number.isInteger(it.qty) || it.qty <= 0)) {
+    if (
+      items.some(
+        (it) => !it.skuCode || !Number.isInteger(it.qty) || it.qty <= 0,
+      )
+    ) {
       throw new BadRequestException('Invalid items');
     }
 
     // 先讀取 SKU
     const skuCodes = [...new Set(items.map((i) => i.skuCode))];
-    const skus = await this.prisma.sku.findMany({ where: { skuCode: { in: skuCodes } } });
+    const skus = await this.prisma.sku.findMany({
+      where: { skuCode: { in: skuCodes } },
+    });
 
     if (skus.length !== skuCodes.length) {
       throw new BadRequestException('One or more SKUs not found');
@@ -74,21 +84,30 @@ export class OrdersService {
       };
     });
 
-    const subtotalAmount = orderItems.reduce((sum, it) => sum + it.totalPrice, 0);
+    const subtotalAmount = orderItems.reduce(
+      (sum, it) => sum + it.totalPrice,
+      0,
+    );
     let pointsRedeemed = 0;
-    
+
     // 點數折抵邏輯
-    if (input.memberId && input.points_to_redeem && input.points_to_redeem > 0) {
-      const member = await this.prisma.member.findUnique({ where: { id: input.memberId } });
+    if (
+      input.memberId &&
+      input.points_to_redeem &&
+      input.points_to_redeem > 0
+    ) {
+      const member = await this.prisma.member.findUnique({
+        where: { id: input.memberId },
+      });
       if (!member) throw new NotFoundException('Member not found');
-      
+
       const available = member.pointsBalance;
       const toRedeem = Math.floor(input.points_to_redeem);
-      
+
       if (toRedeem > available) {
         throw new BadRequestException('信用點數餘額不足');
       }
-      
+
       // 折抵上限：不能超過訂單金額
       pointsRedeemed = Math.min(toRedeem, subtotalAmount);
     }
@@ -114,7 +133,8 @@ export class OrdersService {
           where: { id: it.skuId, stock: { gte: it.qty } },
           data: { stock: { decrement: it.qty } },
         });
-        if (updated.count !== 1) throw new BadRequestException('Insufficient stock');
+        if (updated.count !== 1)
+          throw new BadRequestException('Insufficient stock');
       }
 
       let lastError: unknown = null;
@@ -173,21 +193,27 @@ export class OrdersService {
         } catch (e) {
           lastError = e;
           // 唯一鍵衝突就重試
-          if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+          if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === 'P2002'
+          ) {
             continue;
           }
           throw e;
         }
       }
 
-      throw new BadRequestException('Failed to generate order number', { cause: lastError as Error });
+      throw new BadRequestException('Failed to generate order number', {
+        cause: lastError as Error,
+      });
     });
   }
 
   async lookupGuestOrder(input: LookupGuestOrderInput) {
     const orderNumber = input?.order_number?.trim();
     const email = normalizeEmail(input?.email ?? '');
-    if (!orderNumber || !email) throw new BadRequestException('order_number and email required');
+    if (!orderNumber || !email)
+      throw new BadRequestException('order_number and email required');
 
     const order = await this.prisma.order.findFirst({
       where: { orderNumber, shippingEmail: email },
@@ -267,7 +293,10 @@ export class OrdersService {
         ? {
             bank_code: latestPayment.atmBankCode ?? null,
             account_masked: latestPayment.atmAccount
-              ? latestPayment.atmAccount.replace(/^(\d{3})\d+(\d{3})$/, '$1****$2')
+              ? latestPayment.atmAccount.replace(
+                  /^(\d{3})\d+(\d{3})$/,
+                  '$1****$2',
+                )
               : null,
             expire_at: latestPayment.atmExpireAt ?? null,
           }
@@ -313,7 +342,8 @@ export class OrdersService {
   async reportAtmTransfer(input: LookupGuestOrderInput) {
     const orderNumber = input?.order_number?.trim();
     const email = normalizeEmail(input?.email ?? '');
-    if (!orderNumber || !email) throw new BadRequestException('order_number and email required');
+    if (!orderNumber || !email)
+      throw new BadRequestException('order_number and email required');
 
     const order = await this.prisma.order.findFirst({
       where: { orderNumber, shippingEmail: email },
@@ -331,7 +361,9 @@ export class OrdersService {
       data: { customerReportedPaidAt: new Date() },
     });
 
-    return { order_number: updated.orderNumber, customer_reported_paid_at: updated.customerReportedPaidAt };
+    return {
+      order_number: updated.orderNumber,
+      customer_reported_paid_at: updated.customerReportedPaidAt,
+    };
   }
 }
-

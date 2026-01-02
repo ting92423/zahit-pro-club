@@ -12,4 +12,3 @@ export class AdminSalesController {
     return { data: await this.sales.report({ from, to }) };
   }
 }
-

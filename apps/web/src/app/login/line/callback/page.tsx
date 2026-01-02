@@ -24,7 +24,7 @@ export default function LineCallbackPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code }),
         });
-        const json = await res.json();
+        const json = (await res.json().catch(() => null)) as any;
         
         if (!res.ok) throw new Error(json?.error?.message || 'Authentication failed');
 

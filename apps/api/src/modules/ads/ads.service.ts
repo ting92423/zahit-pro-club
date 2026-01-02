@@ -14,9 +14,12 @@ export class AdsService {
       ],
     };
     if (position) where.position = position;
-    
+
     // Simple tier logic: guest sees all, or we could filter
-    const ads = await this.prisma.adPlacement.findMany({ where, orderBy: { createdAt: 'desc' } });
+    const ads = await this.prisma.adPlacement.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
     return ads;
   }
 

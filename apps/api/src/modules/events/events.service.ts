@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TIER_THRESHOLDS } from '@zahit/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { randomBytes } from 'crypto';
@@ -59,7 +63,9 @@ export class EventsService {
   }
 
   async getRegistrations(eventId: string) {
-    const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) throw new NotFoundException('Event not found');
 
     const regs = await this.prisma.eventRegistration.findMany({
@@ -70,8 +76,13 @@ export class EventsService {
     return { event, registrations: regs };
   }
 
-  async register(eventId: string, input: { name: string; phone: string; email: string; memberId?: string }) {
-    const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+  async register(
+    eventId: string,
+    input: { name: string; phone: string; email: string; memberId?: string },
+  ) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) throw new NotFoundException('Event not found');
     if (event.currentSlots >= event.maxSlots && event.maxSlots > 0) {
       throw new BadRequestException('Event is full');
@@ -80,16 +91,24 @@ export class EventsService {
     // 等級檢查
     if (event.minTier && event.minTier !== 'GUEST') {
       if (!input.memberId) {
-        throw new BadRequestException(`此任務僅限 ${event.minTier} 等級以上會員報名`);
+        throw new BadRequestException(
+          `此任務僅限 ${event.minTier} 等級以上會員報名`,
+        );
       }
-      const member = await this.prisma.member.findUnique({ where: { id: input.memberId } });
+      const member = await this.prisma.member.findUnique({
+        where: { id: input.memberId },
+      });
       if (!member) throw new NotFoundException('Member not found');
 
-      const userTierScore = TIER_THRESHOLDS[member.tier as keyof typeof TIER_THRESHOLDS] ?? 0;
-      const requiredTierScore = TIER_THRESHOLDS[event.minTier as keyof typeof TIER_THRESHOLDS] ?? 0;
+      const userTierScore =
+        TIER_THRESHOLDS[member.tier as keyof typeof TIER_THRESHOLDS] ?? 0;
+      const requiredTierScore =
+        TIER_THRESHOLDS[event.minTier as keyof typeof TIER_THRESHOLDS] ?? 0;
 
       if (userTierScore < requiredTierScore) {
-        throw new BadRequestException(`您的等級不足（需要 ${event.minTier} 以上）`);
+        throw new BadRequestException(
+          `您的等級不足（需要 ${event.minTier} 以上）`,
+        );
       }
     }
 
@@ -126,7 +145,8 @@ export class EventsService {
     });
 
     if (!reg) throw new NotFoundException('Invalid QR code');
-    if (reg.status === 'CHECKED_IN') throw new BadRequestException('Already checked in');
+    if (reg.status === 'CHECKED_IN')
+      throw new BadRequestException('Already checked in');
     // 這裡可加邏輯：若未付款不能報到 (待電商/金流模組整合)
 
     return this.prisma.eventRegistration.update({

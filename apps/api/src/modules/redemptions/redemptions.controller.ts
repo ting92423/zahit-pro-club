@@ -1,4 +1,13 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { Roles } from '../rbac/roles.decorator';
 import { RedemptionsService } from './redemptions.service';
 
@@ -14,7 +23,9 @@ export class RedemptionsController {
   @Roles('MEMBER')
   @Post('redeem')
   async redeem(@Req() req: any, @Body() body: { itemId: string }) {
-    return { data: await this.redemptions.redeem(req.user.memberId, body.itemId) };
+    return {
+      data: await this.redemptions.redeem(req.user.memberId, body.itemId),
+    };
   }
 
   @Roles('ADMIN', 'STAFF')

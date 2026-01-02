@@ -110,7 +110,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await req.json().catch(() => null);
+  const body = (await req.json().catch(() => null)) as any;
   if (!body) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }

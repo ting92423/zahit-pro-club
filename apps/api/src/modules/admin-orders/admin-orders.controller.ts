@@ -27,7 +27,13 @@ export class AdminOrdersController {
     @Param('orderNumber') orderNumber: string,
     @Body() body: { status: OrderStatus; force?: boolean },
   ) {
-    return { data: await this.orders.updateStatus(orderNumber, body.status, body.force) };
+    return {
+      data: await this.orders.updateStatus(
+        orderNumber,
+        body.status,
+        body.force,
+      ),
+    };
   }
 
   @Patch(':orderNumber/shipping')
@@ -38,4 +44,3 @@ export class AdminOrdersController {
     return { data: await this.orders.updateShipping(orderNumber, body) };
   }
 }
-

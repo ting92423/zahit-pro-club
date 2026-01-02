@@ -13,7 +13,11 @@ function dotNetUrlEncode(input: string) {
     .replace(/%5f/gi, '_');
 }
 
-export function computeCheckMacValue(params: Record<string, unknown>, hashKey: string, hashIv: string) {
+export function computeCheckMacValue(
+  params: Record<string, unknown>,
+  hashKey: string,
+  hashIv: string,
+) {
   const filtered: Record<string, string> = {};
   for (const [k, v] of Object.entries(params)) {
     if (v === undefined || v === null) continue;
@@ -28,9 +32,12 @@ export function computeCheckMacValue(params: Record<string, unknown>, hashKey: s
   return crypto.createHash('md5').update(encoded).digest('hex').toUpperCase();
 }
 
-export function verifyCheckMacValue(params: Record<string, unknown>, hashKey: string, hashIv: string) {
+export function verifyCheckMacValue(
+  params: Record<string, unknown>,
+  hashKey: string,
+  hashIv: string,
+) {
   const expected = computeCheckMacValue(params, hashKey, hashIv);
   const provided = String(params.CheckMacValue ?? '');
   return expected === provided;
 }
-

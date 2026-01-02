@@ -52,7 +52,12 @@ export class NotificationsService {
     });
   }
 
-  async create(data: { memberId?: string; title: string; content: string; type?: string }) {
+  async create(data: {
+    memberId?: string;
+    title: string;
+    content: string;
+    type?: string;
+  }) {
     const type = data.type || 'SYSTEM';
 
     // If targeting a single member, keep it simple.
@@ -72,7 +77,12 @@ export class NotificationsService {
     if (members.length === 0) {
       // fallback: keep a system record
       return this.prisma.notification.create({
-        data: { memberId: null, title: data.title, content: data.content, type },
+        data: {
+          memberId: null,
+          title: data.title,
+          content: data.content,
+          type,
+        },
       });
     }
 

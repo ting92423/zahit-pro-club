@@ -1,4 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+} from '@nestjs/common';
 import jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -56,8 +63,11 @@ export class AuthLineController {
         }),
       });
 
-      const tokenData = (await tokenRes.json()) as any;
-      if (!tokenRes.ok) throw new Error(tokenData.error_description || 'Failed to exchange token');
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok)
+        throw new Error(
+          tokenData.error_description || 'Failed to exchange token',
+        );
 
       const idToken = tokenData.id_token;
       // In a real app, we should verify the ID token signature.
@@ -98,10 +108,16 @@ export class AuthLineController {
       }
 
       // 3. Issue our own JWT
-      const token = jwt.sign({ role: 'MEMBER', memberId: member.id }, jwtSecret, { expiresIn: '7d' });
+      const token = jwt.sign(
+        { role: 'MEMBER', memberId: member.id },
+        jwtSecret,
+        { expiresIn: '7d' },
+      );
       return { data: { token, role: 'MEMBER', member_id: member.id } };
     } catch (err) {
-      throw new BadRequestException(err instanceof Error ? err.message : 'LINE authentication failed');
+      throw new BadRequestException(
+        err instanceof Error ? err.message : 'LINE authentication failed',
+      );
     }
   }
 }

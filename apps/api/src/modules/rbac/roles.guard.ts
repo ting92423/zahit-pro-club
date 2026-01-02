@@ -31,7 +31,9 @@ export class RolesGuard implements CanActivate {
 
     const auth = req.headers['authorization'];
     const bearer = Array.isArray(auth) ? auth[0] : auth;
-    const token = bearer?.startsWith('Bearer ') ? bearer.slice('Bearer '.length) : undefined;
+    const token = bearer?.startsWith('Bearer ')
+      ? bearer.slice('Bearer '.length)
+      : undefined;
 
     if (!token) throw new UnauthorizedException('Missing token');
 
@@ -46,7 +48,8 @@ export class RolesGuard implements CanActivate {
     }
 
     const role = payload?.role as Role | undefined;
-    const memberId = typeof payload?.memberId === 'string' ? payload.memberId : undefined;
+    const memberId =
+      typeof payload?.memberId === 'string' ? payload.memberId : undefined;
 
     if (!role) throw new UnauthorizedException('Missing role');
 
@@ -56,4 +59,3 @@ export class RolesGuard implements CanActivate {
     return requiredRoles.includes(role);
   }
 }
-

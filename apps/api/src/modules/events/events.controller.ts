@@ -25,7 +25,8 @@ export class EventsController {
   @Post(':id/register')
   async register(
     @Param('id') id: string,
-    @Body() body: { name: string; phone: string; email: string; memberId?: string },
+    @Body()
+    body: { name: string; phone: string; email: string; memberId?: string },
   ) {
     return { data: await this.events.register(id, body) };
   }

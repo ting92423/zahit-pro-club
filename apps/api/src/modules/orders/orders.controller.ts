@@ -24,7 +24,9 @@ export class OrdersController {
   @Roles('MEMBER')
   @Get(':orderNumber')
   async getMyOrder(@Param('orderNumber') orderNumber: string, @Req() req: any) {
-    return { data: await this.orders.getMemberOrder(req.user?.memberId, orderNumber) };
+    return {
+      data: await this.orders.getMemberOrder(req.user?.memberId, orderNumber),
+    };
   }
 
   @Post('lookup')
@@ -37,4 +39,3 @@ export class OrdersController {
     return { data: await this.orders.reportAtmTransfer(body) };
   }
 }
-

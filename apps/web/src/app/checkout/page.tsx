@@ -24,7 +24,7 @@ async function getMyPoints() {
   const res = await fetch(`${getApiBase()}/me`, {
     headers: { authorization: `Bearer ${token}` },
   });
-  const json = await res.json();
+  const json = (await res.json().catch(() => null)) as any;
   if (!res.ok) return null;
   return json.data?.points_balance as number;
 }

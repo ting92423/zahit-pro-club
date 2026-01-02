@@ -27,7 +27,7 @@ export function StaffScanClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ qr_token: token }),
       });
-      let json = await res.json();
+      let json = (await res.json().catch(() => null)) as any;
       
       if (!res.ok) {
         // 如果活動核銷失敗，嘗試兌換券核銷
@@ -36,7 +36,7 @@ export function StaffScanClient() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ qr_token: token }),
         });
-        json = await res.json();
+        json = (await res.json().catch(() => null)) as any;
         
         if (!res.ok) throw new Error(json?.error?.message || 'Verification failed');
         

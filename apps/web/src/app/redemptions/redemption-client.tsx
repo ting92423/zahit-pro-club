@@ -24,7 +24,7 @@ export function MemberRedemptionClient() {
     setIsLoading(true);
     try {
       const res = await fetch('/api/redemptions/items', { cache: 'no-store' });
-      const json = await res.json();
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error('Load failed');
       setItems(json.data);
     } catch (e) {
@@ -48,7 +48,7 @@ export function MemberRedemptionClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId }),
       });
-      const json = await res.json();
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message || 'Redemption failed');
       
       alert('兌換成功！請至會員中心查看憑證。');

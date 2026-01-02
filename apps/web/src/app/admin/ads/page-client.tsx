@@ -33,7 +33,7 @@ export function AdminAdsClient() {
     setIsLoading(true);
     try {
       const res = await fetch('/api/ads/admin', { cache: 'no-store' });
-      const json = await res.json();
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message || 'Load failed');
       setItems(json.data);
     } catch (e) {

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -35,7 +39,9 @@ export class AdminOrdersService {
         .map((s) => s.trim())
         .filter(Boolean);
 
-      const statuses = parts.filter((s) => Object.values(OrderStatus).includes(s as any)) as OrderStatus[];
+      const statuses = parts.filter((s) =>
+        Object.values(OrderStatus).includes(s as any),
+      ) as OrderStatus[];
       if (statuses.length === 1) where.status = statuses[0];
       if (statuses.length > 1) where.status = { in: statuses };
     }
@@ -74,7 +80,10 @@ export class AdminOrdersService {
   async get(orderNumber: string) {
     const order = await this.prisma.order.findFirst({
       where: { orderNumber },
-      include: { items: { include: { sku: { include: { product: true } } } }, payments: true },
+      include: {
+        items: { include: { sku: { include: { product: true } } } },
+        payments: true,
+      },
     });
     if (!order) throw new NotFoundException('Order not found');
 
@@ -120,7 +129,9 @@ export class AdminOrdersService {
     if (!force) {
       const allowed = ALLOWED_NEXT[order.status] ?? [];
       if (!allowed.includes(next)) {
-        throw new BadRequestException(`Invalid transition: ${order.status} -> ${next}`);
+        throw new BadRequestException(
+          `Invalid transition: ${order.status} -> ${next}`,
+        );
       }
     }
 
@@ -129,7 +140,10 @@ export class AdminOrdersService {
     if (next === 'SHIPPED') data.shippedAt = now;
     if (next === 'COMPLETED') data.completedAt = now;
 
-    const updated = await this.prisma.order.update({ where: { id: order.id }, data });
+    const updated = await this.prisma.order.update({
+      where: { id: order.id },
+      data,
+    });
 
     // 若變更為 PAID，自動發放點數
     if (next === OrderStatus.PAID) {
@@ -139,7 +153,10 @@ export class AdminOrdersService {
     return { order_number: updated.orderNumber, status: updated.status };
   }
 
-  async updateShipping(orderNumber: string, input: { carrier?: string; tracking_no?: string }) {
+  async updateShipping(
+    orderNumber: string,
+    input: { carrier?: string; tracking_no?: string },
+  ) {
     const order = await this.prisma.order.findFirst({ where: { orderNumber } });
     if (!order) throw new NotFoundException('Order not found');
 
@@ -158,4 +175,3 @@ export class AdminOrdersService {
     };
   }
 }
-

@@ -22,7 +22,8 @@ export class PaymentsEcpayController {
   @Post('payments/ecpay/create')
   async create(@Body() body: CreatePaymentBody) {
     const webBaseUrl = process.env.WEB_BASE_URL ?? 'http://localhost:3000';
-    const apiBaseUrl = process.env.API_BASE_URL ?? 'http://localhost:3001/api/v1';
+    const apiBaseUrl =
+      process.env.API_BASE_URL ?? 'http://localhost:3001/api/v1';
 
     const { ecpayEndpoint, form } = await this.payments.createPayment({
       order_number: body.order_number,
@@ -36,7 +37,9 @@ export class PaymentsEcpayController {
     const checkMacValue = computeCheckMacValue(form, hashKey, hashIv);
 
     const inputs = Object.entries({ ...form, CheckMacValue: checkMacValue })
-      .map(([k, v]) => `<input type="hidden" name="${k}" value="${String(v)}" />`)
+      .map(
+        ([k, v]) => `<input type="hidden" name="${k}" value="${String(v)}" />`,
+      )
       .join('\n');
 
     const formHtml = `<!doctype html>
@@ -75,10 +78,13 @@ export class PaymentsEcpayController {
     const rtnCode = String(body.RtnCode ?? '');
     const payDate = String(body.PaymentDate ?? '');
 
-    if (!merchantTradeNo) return res.status(400).type('text/plain').send('0|NO');
+    if (!merchantTradeNo)
+      return res.status(400).type('text/plain').send('0|NO');
 
     // 冪等更新：若已成功，callback 重送直接回 OK
-    const payment = await this.prisma.payment.findFirst({ where: { merchantTradeNo } });
+    const payment = await this.prisma.payment.findFirst({
+      where: { merchantTradeNo },
+    });
     if (!payment) return res.status(404).type('text/plain').send('0|NO');
 
     if (payment.status === 'SUCCEEDED') {
@@ -118,17 +124,22 @@ export class PaymentsEcpayController {
     const hashKey = process.env.ECPAY_HASH_KEY!;
     const hashIv = process.env.ECPAY_HASH_IV!;
 
-    if (!hashKey || !hashIv) return res.status(500).type('text/plain').send('0|NO');
-    if (!verifyCheckMacValue(body, hashKey, hashIv)) return res.status(400).type('text/plain').send('0|NO');
+    if (!hashKey || !hashIv)
+      return res.status(500).type('text/plain').send('0|NO');
+    if (!verifyCheckMacValue(body, hashKey, hashIv))
+      return res.status(400).type('text/plain').send('0|NO');
 
     const merchantTradeNo = String(body.MerchantTradeNo ?? '');
-    if (!merchantTradeNo) return res.status(400).type('text/plain').send('0|NO');
+    if (!merchantTradeNo)
+      return res.status(400).type('text/plain').send('0|NO');
 
     const bankCode = String(body.BankCode ?? '');
     const vAccount = String(body.vAccount ?? body.VAccount ?? '');
     const expireDateRaw = String(body.ExpireDate ?? body.ExpireDateTime ?? '');
 
-    const payment = await this.prisma.payment.findFirst({ where: { merchantTradeNo } });
+    const payment = await this.prisma.payment.findFirst({
+      where: { merchantTradeNo },
+    });
     if (!payment) return res.status(404).type('text/plain').send('0|NO');
 
     // 綠界 ATM：此回呼通常代表「繳費資訊已產生」
@@ -138,7 +149,9 @@ export class PaymentsEcpayController {
         status: 'PENDING',
         atmBankCode: bankCode || payment.atmBankCode,
         atmAccount: vAccount || payment.atmAccount,
-        atmExpireAt: expireDateRaw ? new Date(expireDateRaw) : payment.atmExpireAt,
+        atmExpireAt: expireDateRaw
+          ? new Date(expireDateRaw)
+          : payment.atmExpireAt,
         rawCallback: body as any,
       },
     });
@@ -146,4 +159,3 @@ export class PaymentsEcpayController {
     return res.type('text/plain').send('1|OK');
   }
 }
-

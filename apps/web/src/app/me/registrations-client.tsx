@@ -25,7 +25,7 @@ export function MemberRegistrationsClient({ initial }: { initial: RegistrationRo
     try {
       const qs = new URLSearchParams({ take: '20', cursor });
       const res = await fetch(`/api/me/registrations?${qs.toString()}`, { cache: 'no-store' });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Load failed');
       const data = (json?.data ?? []) as RegistrationRow[];
       setItems((prev) => [...prev, ...data]);

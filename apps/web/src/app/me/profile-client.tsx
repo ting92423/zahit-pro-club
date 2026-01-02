@@ -46,7 +46,7 @@ export function MemberProfileClient({
           },
         }),
       });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Save failed');
       router.refresh();
     } catch (e) {

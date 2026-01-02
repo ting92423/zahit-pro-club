@@ -35,7 +35,7 @@ export function OrderQuickAction({ orderNumber, currentStatus }: { orderNumber: 
         body: JSON.stringify({ status: next, force: true }),
       });
       if (!res.ok) {
-        const json = await res.json();
+        const json = (await res.json().catch(() => null)) as any;
         throw new Error(json?.error?.message ?? 'Update failed');
       }
       router.refresh();

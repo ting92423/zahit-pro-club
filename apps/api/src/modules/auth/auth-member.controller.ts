@@ -56,14 +56,20 @@ export class AuthMemberController {
   @Post('verify-otp')
   async verifyOtp(
     @Body()
-    body: { email?: string; code?: string; name?: string; phone?: string },
+    body: {
+      email?: string;
+      code?: string;
+      name?: string;
+      phone?: string;
+    },
   ) {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) throw new BadRequestException('JWT_SECRET not configured');
 
     const email = normalizeEmail(body?.email ?? '');
     const code = String(body?.code ?? '').trim();
-    if (!email || !code) throw new BadRequestException('Email and code required');
+    if (!email || !code)
+      throw new BadRequestException('Email and code required');
 
     // 找最新一筆未使用且未過期的 OTP
     const otp = await this.prisma.memberOtp.findFirst({
@@ -77,7 +83,10 @@ export class AuthMemberController {
     });
     if (!otp) throw new BadRequestException('Invalid or expired code');
 
-    await this.prisma.memberOtp.update({ where: { id: otp.id }, data: { usedAt: new Date() } });
+    await this.prisma.memberOtp.update({
+      where: { id: otp.id },
+      data: { usedAt: new Date() },
+    });
 
     let member = await this.prisma.member.findUnique({ where: { email } });
 
@@ -97,8 +106,9 @@ export class AuthMemberController {
       });
     }
 
-    const token = jwt.sign({ role: 'MEMBER', memberId: member.id }, jwtSecret, { expiresIn: '7d' });
+    const token = jwt.sign({ role: 'MEMBER', memberId: member.id }, jwtSecret, {
+      expiresIn: '7d',
+    });
     return { data: { token, role: 'MEMBER', member_id: member.id } };
   }
 }
-

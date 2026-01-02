@@ -48,7 +48,9 @@ export class PaymentsEcpayService {
     const merchantId = process.env.ECPAY_MERCHANT_ID;
     const hashKey = process.env.ECPAY_HASH_KEY;
     const hashIv = process.env.ECPAY_HASH_IV;
-    const ecpayEndpoint = process.env.ECPAY_ENDPOINT ?? 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
+    const ecpayEndpoint =
+      process.env.ECPAY_ENDPOINT ??
+      'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
 
     if (!merchantId || !hashKey || !hashIv) {
       throw new BadRequestException('ECPay env vars not configured');
@@ -59,9 +61,11 @@ export class PaymentsEcpayService {
       include: { items: { include: { sku: { include: { product: true } } } } },
     });
     if (!order) throw new BadRequestException('Order not found');
-    if (order.totalAmount <= 0) throw new BadRequestException('Invalid order amount');
+    if (order.totalAmount <= 0)
+      throw new BadRequestException('Invalid order amount');
 
-    const method = input.method === 'ATM' ? PaymentMethod.ATM : PaymentMethod.CREDIT;
+    const method =
+      input.method === 'ATM' ? PaymentMethod.ATM : PaymentMethod.CREDIT;
 
     const merchantTradeNo = generateMerchantTradeNo();
     const payment = await this.prisma.payment.create({
@@ -78,7 +82,9 @@ export class PaymentsEcpayService {
     const itemName =
       order.items.length === 0
         ? 'Zahit Order'
-        : order.items.map((it) => `${it.sku.product.name} x${it.qty}`).join('#');
+        : order.items
+            .map((it) => `${it.sku.product.name} x${it.qty}`)
+            .join('#');
 
     const returnUrl = `${input.api_base_url.replace(/\/+$/, '')}/payments/ecpay/callback`;
     const webBase = input.web_base_url.replace(/\/+$/, '');
@@ -111,4 +117,3 @@ export class PaymentsEcpayService {
     return { ecpayEndpoint, form: baseForm, payment_id: payment.id };
   }
 }
-

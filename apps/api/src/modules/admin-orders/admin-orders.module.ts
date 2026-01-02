@@ -9,4 +9,3 @@ import { MembersModule } from '../members/members.module';
   providers: [AdminOrdersService],
 })
 export class AdminOrdersModule {}
-

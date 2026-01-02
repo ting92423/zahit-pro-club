@@ -18,7 +18,7 @@ export function MemberLedgerClient({ initial, emptyText }: { initial: LedgerRow[
     try {
       const qs = new URLSearchParams({ take: '20', cursor });
       const res = await fetch(`/api/me/ledger?${qs.toString()}`, { cache: 'no-store' });
-      const json = await res.json().catch(() => null);
+      const json = (await res.json().catch(() => null)) as any;
       if (!res.ok) throw new Error(json?.error?.message ?? 'Load failed');
       const data = (json?.data ?? []) as LedgerRow[];
       setItems((prev) => [...prev, ...data]);

@@ -8,7 +8,8 @@ export class AuthAdminController {
     const adminPassword = process.env.ADMIN_PASSWORD;
     const jwtSecret = process.env.JWT_SECRET;
 
-    if (!adminPassword) throw new BadRequestException('ADMIN_PASSWORD not configured');
+    if (!adminPassword)
+      throw new BadRequestException('ADMIN_PASSWORD not configured');
     if (!jwtSecret) throw new BadRequestException('JWT_SECRET not configured');
 
     if (!body?.password || body.password !== adminPassword) {
@@ -19,4 +20,3 @@ export class AuthAdminController {
     return { data: { token, role: 'ADMIN' } };
   }
 }
-

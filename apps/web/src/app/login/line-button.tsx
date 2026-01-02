@@ -12,7 +12,7 @@ export function LineLoginButton() {
     setIsLoading(true);
     try {
       const res = await fetch('/api/auth/member/line/login-url');
-      const json = await res.json();
+      const json = (await res.json().catch(() => null)) as any;
       if (res.ok && json.data?.url) {
         window.location.href = json.data.url;
       } else {

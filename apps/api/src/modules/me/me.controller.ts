@@ -1,4 +1,12 @@
-import { BadRequestException, Body, Controller, Get, Patch, Query, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { TIER_BENEFITS } from '@zahit/shared';
 import { Roles } from '../rbac/roles.decorator';
 import { PrismaService } from '../prisma/prisma.service';
@@ -24,10 +32,18 @@ export class MeController {
       where: { id: memberId },
       include: {
         pointLedgers: { orderBy: { createdAt: 'desc' }, take: 20 },
-        eventRegistrations: { orderBy: { createdAt: 'desc' }, take: 20, include: { event: true } },
+        eventRegistrations: {
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+          include: { event: true },
+        },
         orders: { orderBy: { createdAt: 'desc' }, take: 20 },
         notifications: { orderBy: { createdAt: 'desc' }, take: 20 },
-        redemptions: { orderBy: { createdAt: 'desc' }, take: 20, include: { item: true } },
+        redemptions: {
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+          include: { item: true },
+        },
       },
     });
 
@@ -47,7 +63,8 @@ export class MeController {
             },
             preferences: member.preferences ?? null,
             tier: member.tier,
-            benefits: TIER_BENEFITS[member.tier as keyof typeof TIER_BENEFITS] ?? [],
+            benefits:
+              TIER_BENEFITS[member.tier as keyof typeof TIER_BENEFITS] ?? [],
             points_balance: member.pointsBalance,
             total_spent: member.totalSpent,
             notifications: member.notifications.map((n) => ({
@@ -121,7 +138,10 @@ export class MeController {
       total_amount: o.totalAmount,
       created_at: o.createdAt,
     }));
-    return { data, meta: { nextCursor: data.length ? data[data.length - 1].id : null } };
+    return {
+      data,
+      meta: { nextCursor: data.length ? data[data.length - 1].id : null },
+    };
   }
 
   @Roles('MEMBER')
@@ -155,7 +175,10 @@ export class MeController {
       },
     }));
 
-    return { data, meta: { nextCursor: data.length ? data[data.length - 1].id : null } };
+    return {
+      data,
+      meta: { nextCursor: data.length ? data[data.length - 1].id : null },
+    };
   }
 
   @Roles('MEMBER')
@@ -185,7 +208,10 @@ export class MeController {
       item: { title: r.item.title, description: r.item.description },
     }));
 
-    return { data, meta: { nextCursor: data.length ? data[data.length - 1].id : null } };
+    return {
+      data,
+      meta: { nextCursor: data.length ? data[data.length - 1].id : null },
+    };
   }
 
   @Roles('MEMBER')
@@ -213,7 +239,10 @@ export class MeController {
       created_at: p.createdAt,
     }));
 
-    return { data, meta: { nextCursor: data.length ? data[data.length - 1].id : null } };
+    return {
+      data,
+      meta: { nextCursor: data.length ? data[data.length - 1].id : null },
+    };
   }
 
   @Roles('MEMBER')
@@ -250,13 +279,17 @@ export class MeController {
     if (address !== undefined && address.length > 200) {
       throw new BadRequestException('Invalid address');
     }
-    if (carBrand !== undefined && carBrand.length > 50) throw new BadRequestException('Invalid car brand');
-    if (carModel !== undefined && carModel.length > 80) throw new BadRequestException('Invalid car model');
-    if (carPlate !== undefined && carPlate.length > 20) throw new BadRequestException('Invalid car plate');
+    if (carBrand !== undefined && carBrand.length > 50)
+      throw new BadRequestException('Invalid car brand');
+    if (carModel !== undefined && carModel.length > 80)
+      throw new BadRequestException('Invalid car model');
+    if (carPlate !== undefined && carPlate.length > 20)
+      throw new BadRequestException('Invalid car plate');
     if (carYear !== undefined && carYear !== null) {
       const y = Number(carYear);
       const now = new Date().getFullYear() + 1;
-      if (!Number.isInteger(y) || y < 1950 || y > now) throw new BadRequestException('Invalid car year');
+      if (!Number.isInteger(y) || y < 1950 || y > now)
+        throw new BadRequestException('Invalid car year');
     }
 
     const updated = await this.prisma.member.update({
@@ -267,9 +300,13 @@ export class MeController {
         ...(address !== undefined ? { address } : {}),
         ...(carBrand !== undefined ? { carBrand } : {}),
         ...(carModel !== undefined ? { carModel } : {}),
-        ...(carYear !== undefined ? { carYear: carYear === null ? null : Number(carYear) } : {}),
+        ...(carYear !== undefined
+          ? { carYear: carYear === null ? null : Number(carYear) }
+          : {}),
         ...(carPlate !== undefined ? { carPlate } : {}),
-        ...(body.preferences !== undefined ? { preferences: body.preferences } : {}),
+        ...(body.preferences !== undefined
+          ? { preferences: body.preferences }
+          : {}),
       },
     });
 
@@ -290,4 +327,3 @@ export class MeController {
     };
   }
 }
-
