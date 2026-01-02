@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
 }
 
 // 先落「首日必備」的最小核心（依 `docs/pro-club-erd.md`）。
