@@ -3,8 +3,7 @@ generator client {
 }
 
 datasource db {
-  // 本機開發先用 sqlite（無需安裝 DB）；日後上線可切回 postgresql 並重跑 migration。
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // 先落「首日必備」的最小核心（依 `docs/pro-club-erd.md`）。
