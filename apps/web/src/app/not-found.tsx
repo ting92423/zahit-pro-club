@@ -1,5 +1,7 @@
 // Provide a simple App Router not-found boundary.
 // next-on-pages may fail when relying on Next's internal default not-found implementation.
+export const runtime = 'edge';
+
 export default function NotFound() {
   return (
     <div className="min-h-dvh bg-background text-foreground flex items-center justify-center p-6">
